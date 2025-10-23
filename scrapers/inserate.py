@@ -44,7 +44,7 @@ async def get_inserate_klaz(browser_manager: PlaywrightManager,
         results = []
 
         for i in range(page_count):
-            page_results = await get_ads(page)
+            page_results = await get_ads(page, query)
             results.extend(page_results)
 
             if i < page_count - 1:
@@ -61,7 +61,7 @@ async def get_inserate_klaz(browser_manager: PlaywrightManager,
         await browser_manager.close_page(page)
 
 
-async def get_ads(page):
+async def get_ads(page, query: str = None):
     try:
         items = await page.query_selector_all(".ad-listitem:not(.is-topad):not(.badge-hint-pro-small-srp)")
         results = []
@@ -82,7 +82,7 @@ async def get_ads(page):
                 description_text = await description.inner_text() if description else ""
                 if data_adid and data_href:
                     data_href = f"https://www.kleinanzeigen.de{data_href}"
-                    results.append({"adid": data_adid, "url": data_href, "title": title_text, "price": price_text, "description": description_text})
+                    results.append({"adid": data_adid, "url": data_href, "title": title_text, "price": price_text, "description": description_text, "query": query})
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
